@@ -14,37 +14,11 @@ function solution() {
     input.forEach((input) => {
         let invalidArr = findInvalid(input);
         for (const i in invalidArr) {
-            output += invalidArr[i]!
+            output += invalidArr[i]!;
         }
     });
     console.log(output);
 }
-
-function test() {
-    let input: string[][] = [];
-    let output = 0;
-    const ranges = readInput(testPath);
-    ranges.forEach((range) => {
-        let temp = range.split("-");
-        input.push(temp);
-    });
-    input.forEach((input) => {
-        console.log(input);
-        let invalidArr = findInvalid(input);
-        console.log(invalidArr)
-        for (const i in invalidArr) {
-            output = output + invalidArr[i]!
-        }
-    });
-    console.log(output);
-}
-
-function readTest(testPath: string) {
-    const data = fs.readFileSync(path, "utf8").trim();
-    const ranges = data.split(",");
-    return ranges;
-}
-
 
 function findInvalid(s: string[]): number[] {
     let lo = parseInt(s[0]!);
@@ -63,13 +37,25 @@ function findInvalid(s: string[]): number[] {
 function isInvalid(num: number): boolean {
     let numStr = num.toString();
     let len = numStr.length;
-    if (len % 2 !== 0) {
-        return false;
-    }
     const x = numStr.slice(0, len / 2);
     const y = numStr.slice(len / 2, len);
     if (x === y) {
         return true;
+    }
+    for (let parts = 2; parts <= len; parts++) {
+        let invalidFlag = true
+        const part = numStr.slice(0, len/parts)
+        const partLen = len / parts
+        for (let i = 1; i < parts; i++) {
+            let start = partLen * i
+            if (part !== numStr.slice(start, start + partLen)) {
+                invalidFlag = false
+                break;
+            }
+        }
+        if (invalidFlag) {
+            return true
+        }
     }
     return false;
 }
