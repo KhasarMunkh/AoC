@@ -12,19 +12,18 @@ function solution() {
     const banks = getBanks(path);
     let answer = 0;
     for (const bank of banks) {
-        let output = findMaxBankJoltage(bank, 12);
-        let joinedOutput = output.join('');
-        answer += parseInt(joinedOutput);
+        let max = findMaxBankJoltage(bank, 12);
+        answer += max;
     }
     console.log(answer);
 }
 
-function findMaxBankJoltage(s: string, numDigits: number = 2) {
+function findMaxBankJoltage(s: string, numDigits: number = 2): number {
     let output: string[] = [];
     let lastValidIndex = -1;
     let temp = { val: -1, index: -1 };
     while (output.length < numDigits) {
-        let maxIndex = s.length + 1 - numDigits + output.length - 1;
+        let maxIndex = s.length + 1 - numDigits + output.length - 1; // the furthest index we can go to
         for (let i = lastValidIndex + 1; i <= maxIndex; i++) {
             let curr = parseInt(s[i]!);
             if (curr > temp.val) {
@@ -36,6 +35,7 @@ function findMaxBankJoltage(s: string, numDigits: number = 2) {
         temp.val = -1;
         lastValidIndex = temp.index;
     }
-    return output;
+    return parseInt(output.join(""));
 }
+
 solution();
