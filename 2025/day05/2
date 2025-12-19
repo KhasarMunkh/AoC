@@ -1,0 +1,90 @@
+import fs, { readFileSync } from "fs";
+
+const path = "input";
+
+// 154677529022353-159180259958574
+// 386166873310995-386598196370557
+// 161698244411647-169426926930313
+// 101121763798794-101657976665598
+// 63508818748698-69570783943787
+
+type Range = {
+    start: BigInt;
+    end: BigInt;
+};
+
+function getData(path: string) {
+    const input = readFileSync(path, "utf-8").trim();
+    const [rangeBlock, idsBlock] = input.split(/\n\s*\n/);
+    return [rangeBlock, idsBlock];
+}
+
+function getRanges(s: string): Range[] {
+    const ranges = s.split("\n").map((line) => {
+        const [start, end] = line.split("-").map(BigInt);
+        return { start, end };
+    });
+    return ranges;
+}
+
+// sort ranges from start ascending (if tie, end ascending)
+function sortRanges(r: Range[]) {
+    r.sort((a, b) => {
+        if (a.start > b.start) return 1;
+        if (a.start < b.start) return -1;
+        // a.start === b.start
+        if (a.end > b.end) return 1;
+        if (a.end < b.end) return -1;
+        return 0;
+    });
+}
+
+function mergeRanges(r: Range[]): Range[] {
+    const merged: Range[] = [];
+    let curr = { ...r[0] };
+    for (let i = 1; i < r.length; i++) {
+        const next = r[i];
+        if (next.start <= curr.end) {
+            // overlapping
+            if (curr.end < next.end) {
+                // next extends past current range
+                curr.end = next.end;
+            }
+        } else {
+            merged.push(curr);
+            curr = { ...next };
+        }
+    }
+    merged.push(curr);
+    return merged;
+}
+
+function isFresh(id: BigInt, merged: Range[]): boolean {
+    let lo = 0;
+    let hi = merged.length - 1;
+    while (lo <= hi) {
+        let mid = lo + (hi - lo); // 2
+        if (id < merged[mid].start) {
+            hi = mid
+        }
+        if (id > merged[mid].end) {
+            lo = mid + 1
+        }
+    }
+    return false;
+}
+
+function solution() {
+    const [rangeBlock, idsBlock] = getData(path);
+    const ranges = getRanges(rangeBlock);
+    sortRanges(ranges);
+    const merged = mergeRanges(ranges);
+    for (let i = 0; i < 5; i++) {
+        console.log(ranges[i]);
+    }
+    for (let i = 0; i < 5; i++) {
+        console.log(merged[i]);
+    }
+}
+
+solution();
